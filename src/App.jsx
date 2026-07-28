@@ -15,6 +15,7 @@ import {
   FiStar,
   FiUsers,
 } from 'react-icons/fi'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 const partnerLogos = [
@@ -118,9 +119,147 @@ const socials = [
   { name: 'Website', icon: FiGlobe, href: '#' },
 ]
 
+function InternshipTrialModal({ isOpen, onClose }) {
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, onClose])
+
+  if (!isOpen) {
+    return null
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose} role="presentation">
+      <section
+        className="modal-shell"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="trial-modal-title"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="modal-topbar">
+          <div>
+            <p className="eyebrow">Modal pengajuan</p>
+            <h2 id="trial-modal-title">Simulasi pengajuan magang</h2>
+          </div>
+
+          <button type="button" className="ghost-button" onClick={onClose}>
+            <FiArrowRight /> Tutup
+          </button>
+        </div>
+
+        <div className="trial-modal-content">
+          <section className="trial-summary">
+            <div className="trial-summary-header">
+              <FiShield />
+              <span>Alur cepat</span>
+            </div>
+            <div className="trial-step">
+              <FiUsers />
+              <p>Isi data mahasiswa, kampus, dan perusahaan tujuan.</p>
+            </div>
+            <div className="trial-step">
+              <FiCheckCircle />
+              <p>Tinjau ringkasan sebelum dikirim sebagai draft.</p>
+            </div>
+            <div className="trial-step">
+              <FiSend />
+              <p>Status simulasi akan muncul di halaman ini.</p>
+            </div>
+          </section>
+
+          <section className="trial-form-section">
+            <div className="section-heading">
+              <p className="eyebrow">Form pengajuan</p>
+              <h3>Isi data percobaan pengajuan magang</h3>
+            </div>
+
+            <div className="trial-grid">
+              <form className="trial-form">
+                <label>
+                  Nama mahasiswa
+                  <input type="text" placeholder="Contoh: Alya Putri" />
+                </label>
+                <label>
+                  Program studi
+                  <input type="text" placeholder="Contoh: Sistem Informasi" />
+                </label>
+                <label>
+                  Perusahaan tujuan
+                  <input type="text" placeholder="Contoh: PT Sinar Solusi Digital" />
+                </label>
+                <label>
+                  Durasi magang
+                  <input type="text" placeholder="Contoh: 3 bulan" />
+                </label>
+                <label>
+                  Catatan singkat
+                  <textarea
+                    rows="5"
+                    placeholder="Tulis minat bidang, waktu magang, atau kebutuhan khusus"
+                  />
+                </label>
+
+                <div className="hero-actions">
+                  <button type="button" className="solid-button">
+                    <FiSend /> Simpan draft pengajuan
+                  </button>
+                  <button type="button" className="ghost-button" onClick={onClose}>
+                    <FiArrowRight /> Kembali ke beranda
+                  </button>
+                </div>
+              </form>
+
+              <aside className="trial-preview">
+                <p className="eyebrow">Preview</p>
+                <h4>Status simulasi</h4>
+                <div className="preview-card">
+                  <span className="preview-badge">Draft</span>
+                  <strong>Menunggu validasi</strong>
+                  <p>
+                    Setelah disambungkan ke backend, data ini bisa dikirim ke admin
+                    atau dosen pembimbing untuk dicek.
+                  </p>
+                </div>
+                <div className="preview-card muted">
+                  <strong>Yang akan tersimpan</strong>
+                  <p>Data mahasiswa, tujuan perusahaan, durasi, dan catatan.</p>
+                </div>
+              </aside>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+  )
+}
+
 function App() {
+  const [isTrialOpen, setIsTrialOpen] = useState(false)
+
   return (
     <div className="app-shell">
+      <InternshipTrialModal
+        isOpen={isTrialOpen}
+        onClose={() => setIsTrialOpen(false)}
+      />
+
       <header className="topbar">
         <div className="brand-lockup">
           <div className="brand-mark">IM</div>
@@ -140,6 +279,13 @@ function App() {
         </nav>
 
         <div className="auth-actions">
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() => setIsTrialOpen(true)}
+          >
+            <FiArrowRight /> Coba ajukan magang
+          </button>
           <button type="button" className="ghost-button">
             <FiLogIn /> Login
           </button>
@@ -164,12 +310,16 @@ function App() {
             </p>
 
             <div className="hero-actions">
-              <a className="solid-link" href="#proposal">
-                Mulai pengajuan <FiArrowRight />
-              </a>
               <a className="ghost-link" href="#approved">
                 Lihat perusahaan ACC
               </a>
+              <button
+                type="button"
+                className="solid-button"
+                onClick={() => setIsTrialOpen(true)}
+              >
+                <FiArrowRight /> Buka modal pengajuan
+              </button>
             </div>
 
             <div className="hero-stats">
